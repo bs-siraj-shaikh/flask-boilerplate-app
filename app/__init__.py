@@ -16,6 +16,7 @@ from flask_restful import Resource,Api
 from flask import jsonify
 from flask_limiter import Limiter
 from flask_limiter import RequestLimit
+from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -90,6 +91,7 @@ def create_app():
         #     'SQLALCHEMY_DATABASE_URI': config_data.get('SQLALCHEMY_TEST_DATABASE_URI')
         #     })
         # Global error handler for error code 429 (Too Many Requests)
+        mail=Mail(application)
         
 
         application.register_error_handler(429, ratelimit_handler)  # type: ignore  # noqa: FKA100
@@ -99,6 +101,7 @@ def create_app():
         r = redis.Redis(host=config_data.get('REDIS').get('HOST'), port=config_data.get(
                 'REDIS').get('PORT'), db=config_data.get('REDIS').get('DB'))
         send_mail_q = Queue(QueueName.SEND_MAIL, connection=r)
+        
 
         limiter = Limiter(app=application, key_func=None, strategy=config_data.get('STRATEGY'),  # Creating instance of Flask-Limiter for rate limiting.
                   key_prefix=config_data.get('KEY_PREFIX'), storage_uri='redis://{}:{}/{}'.format(
@@ -111,7 +114,7 @@ def create_app():
         register_blueprints(application)
         register_swagger_blueprints(application)
 
-        return application
+        return application,mail
 
     except Exception as exception_error:
         logger.error('Unable to create flask app instance : '

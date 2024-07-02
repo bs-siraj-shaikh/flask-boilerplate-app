@@ -17,10 +17,12 @@ from app.helpers.utility import send_json_response
 from app.models.student import Student
 from flask import request
 from flask.views import View
+from app.templates import emails
 import jwt
 import re
 # from flask_jwt_extended import create_access_token
 from werkzeug.security import check_password_hash,generate_password_hash
+from providers.mail import send_mail
 
 
 class StudentView(View):
@@ -131,7 +133,22 @@ class StudentView(View):
 
     
             student_data=student.to_dict()
-
+            
+            
+            # # Prepare email content
+            email_to=data['email']
+            subject="Welcome to school >>>>>"
+            template='emails/welcome.html'
+            # email_type='welcome'
+            email_data={
+                'name':data['name'],
+                'clas':data['clas'],
+                'division':data['division'],
+                'email':data['email'],
+                'password':data['password']
+            }
+            
+            send_mail(email_to=email_to,subject=subject,template=template,data=email_data)
             # print("Newly added student data:", student_data)
             return send_json_response(http_status=HttpStatusCode.OK.value,
                                     response_status=True,
