@@ -41,7 +41,9 @@ REDIS: # Used to initialize redis objects
 SQLALCHEMY_DATABASE_URI: "postgresql://postgres:1234@127.0.0.1:5432/boiler_plate"
 SQLALCHEMY_TRACK_MODIFICATIONS: False
 SQLALCHEMY_ENGINE_OPTIONS: { "isolation_level": "AUTOCOMMIT" }
-CELERY_BROKER_URL: "pyamqp://lims_root_rabbitmq:Ey6ftnhsdyRL6Lpg@localhost:5672/lims_rabbitmq"
+# CELERY_BROKER_URL: "pyamqp://lims_root_rabbitmq:Ey6ftnhsdyRL6Lpg@localhost:5672/lims_rabbitmq"
+CELERY_BROKER_URL: "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND: "redis://localhost:6379/0"
 LOG_FILE_PATH: "/home/bs/Desktop/flask/flask-boilerplate-prod/app.log"
 JWT_SALT: "1234567890"
 HASH_ID_SALT: "0987654321"
