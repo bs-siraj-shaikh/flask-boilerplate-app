@@ -7,21 +7,18 @@ import sys
 import traceback
 
 from app.helpers.constants import HttpStatusCode
-from app.helpers.constants import QueueName
 from app.helpers.constants import ResponseMessageKeys
 import boto3
 from botocore.client import Config
-from flask import Flask,request
-from flask_restful import Resource,Api
+from flask import Flask
 from flask import jsonify
-from flask_limiter import Limiter
 from flask_limiter import RequestLimit
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_swagger_ui import get_swaggerui_blueprint
 import redis
-from rq import Queue
 from rq_scheduler import Scheduler
 import yaml
 
@@ -91,22 +88,11 @@ def create_app():
         #     'SQLALCHEMY_DATABASE_URI': config_data.get('SQLALCHEMY_TEST_DATABASE_URI')
         #     })
         # Global error handler for error code 429 (Too Many Requests)
-        mail=Mail(application)
-        
+        mail = Mail(application)
 
         application.register_error_handler(429, ratelimit_handler)  # type: ignore  # noqa: FKA100
         db.init_app(application)
         Migrate(app=application, db=db, compare_type=True)
-
-        r = redis.Redis(host=config_data.get('REDIS').get('HOST'), port=config_data.get(
-                'REDIS').get('PORT'), db=config_data.get('REDIS').get('DB'))
-        send_mail_q = Queue(QueueName.SEND_MAIL, connection=r)
-        
-
-        limiter = Limiter(app=application, key_func=None, strategy=config_data.get('STRATEGY'),  # Creating instance of Flask-Limiter for rate limiting.
-                  key_prefix=config_data.get('KEY_PREFIX'), storage_uri='redis://{}:{}/{}'.format(
-                config_data.get('REDIS').get('HOST'), config_data.get('REDIS').get('PORT'), config_data.get('RATE_LIMIT').get('REDIS_DB')))
-
 
         app_set_configurations(application=application,
                                config_data=config_data)
@@ -114,7 +100,7 @@ def create_app():
         register_blueprints(application)
         register_swagger_blueprints(application)
 
-        return application,mail
+        return application, mail
 
     except Exception as exception_error:
         logger.error('Unable to create flask app instance : '
@@ -161,6 +147,7 @@ def register_blueprints(application):
         logger.error(output)
         logger.error('=========END=========')
 
+
 def register_swagger_blueprints(application):
     """
     Registers swagger blueprints.
@@ -181,8 +168,7 @@ def register_swagger_blueprints(application):
             swagger_blueprint, url_prefix=swagger_url)
 
     except Exception as exception_error:
-        logger.error('Unable to register blueprints : '
-                     + str(exception_error))
+        logger.error('Unable to register blueprints : ' + str(exception_error))
 
 
 def app_set_configurations(application, config_data):
@@ -197,7 +183,8 @@ def app_set_configurations(application, config_data):
 
 
 r = redis.Redis(host=config_data.get('REDIS').get('HOST'), port=config_data.get(
-                'REDIS').get('PORT'), db=config_data.get('REDIS').get('DB'))
+    'REDIS').get('PORT'), db=config_data.get('REDIS').get('DB'))
+
 
 def clear_scheduler():
     """ Method to delete scheduled jobs in scheduler. """
@@ -207,9 +194,7 @@ def clear_scheduler():
 
 
 application = Flask(__name__)
-api=Api(application)
+api = Api(application)
 app_set_configurations(application=application, config_data=config_data)
-db = SQLAlchemy(app=application,session_options={'expire_on_commit': False})
+db = SQLAlchemy(app=application, session_options={'expire_on_commit': False})
 migrate = Migrate(app=application, db=db, compare_type=True)
-
-

@@ -60,7 +60,7 @@ class FileView(View):
 class AuditView(View):
     """Contains all views for accessing audit logs"""
     @staticmethod
-    @api_time_logger    
+    @api_time_logger
     @token_required
     def list(logged_in_user: User) -> tuple:
         """

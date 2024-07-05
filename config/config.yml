@@ -27,6 +27,15 @@ MAIL:
   MAIL_USE_SSL: False
   MAIL_DEFAULT_SENDER: 'mailtrap@demomailtrap.com'
   MAIL_DEFAULT_SENDER_NAME: "mailtrap"
+# MAIL:
+#   MAIL_SERVER: "bulk.smtp.mailtrap.io"
+#   MAIL_PORT: 587
+#   MAIL_USERNAME: "api"
+#   MAIL_PASSWORD: "7c5701f899445033415f19f0d5a6da88"
+#   MAIL_USE_TLS: True
+#   MAIL_USE_SSL: False
+#   MAIL_DEFAULT_SENDER: 'mailtrap@mailtrap1.club'
+#   MAIL_DEFAULT_SENDER_NAME: "mailtrap"
 
 RATE_LIMIT: # Used by Flask-Limiter
   STRATEGY: "moving-window"

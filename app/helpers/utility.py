@@ -18,6 +18,7 @@ hash_id = Hashids(min_length=7, salt=config_data.get('HASH_ID_SALT'))
 
 
 def days_to_seconds(days: int) -> int:
+    """ returns seconds """
     seconds = 86400 * days  # 24 * 60 * 60 * days
     return seconds
 
@@ -179,8 +180,6 @@ def send_json_response(http_status: int, response_status: bool, message_key: str
         return jsonify({'status': response_status, 'message': message_key, 'data': data}), http_status
     else:
         return jsonify({'status': response_status, 'message': message_key, 'error': error}), http_status
-
-
 
 
 def get_pagination_meta(current_page: int, page_size: int, total_items: int) -> dict:

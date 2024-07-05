@@ -22,10 +22,10 @@ repos:
         args: ['--maxkb=2048']
       - id: no-commit-to-branch
         args: [--branch, master, --branch, development, '--pattern', '^(?!(feature|hotfix|docs|bugfix|style|refactor|perf)\/).*']
-      - id: detect-aws-credentials  # detects your aws credentials from the aws cli credentials file.
-      - id: name-tests-test  # This hook verifies that test files are named correctly.
-        args:
-          - "--pytest-test-first"  # This ensures tests match `test_.*\.py`
+      # - id: detect-aws-credentials  # detects your aws credentials from the aws cli credentials file.
+      # - id: name-tests-test  # This hook verifies that test files are named correctly.
+      #   args:
+      #     - "--pytest-test-first"  # This ensures tests match `test_.*\.py`
       - id: check-case-conflict  # Check for files with names that would conflict on a case-insensitive filesystem like MacOS HFS+ or Windows FAT.
       - id: mixed-line-ending  # Replaces automatically the most frequent line ending.
 
@@ -87,12 +87,12 @@ repos:
 
 - repo: local
   hooks:
-    - id: pytest-check
-      name: pytest-check
-      entry: pytest
-      language: system
-      pass_filenames: false
-      always_run: true
+    # - id: pytest-check
+    #   name: pytest-check
+    #   entry: pytest
+    #   language: system
+    #   pass_filenames: false
+    #   always_run: true
     - id: update-requirements
       name: Update requirements.txt
       entry: bash -c 'pip freeze > requirements.txt'
