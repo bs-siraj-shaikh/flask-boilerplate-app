@@ -82,6 +82,8 @@ def create_app():
     """
     try:
         application = Flask(__name__, instance_relative_config=True)
+        app_set_configurations(application=application,
+                               config_data=config_data)
         application.config.from_object(config_data)
         # if TESTING:
         #     application.config.update({
@@ -91,7 +93,7 @@ def create_app():
         mail = Mail(application)
 
         application.register_error_handler(429, ratelimit_handler)  # type: ignore  # noqa: FKA100
-        db.init_app(application)
+        # db.init_app(application)
         Migrate(app=application, db=db, compare_type=True)
 
         app_set_configurations(application=application,
@@ -130,9 +132,9 @@ def register_blueprints(application):
     :return: None
     """
     try:
+        # from app.views import v1_blueprints
         from app.views import v1_blueprints
         application.register_blueprint(v1_blueprints, url_prefix='/api/v1')
-
     except Exception as exception_error:
         trace = traceback.extract_tb(sys.exc_info()[2])
         # Add the event to the log

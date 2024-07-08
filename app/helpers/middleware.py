@@ -1,35 +1,41 @@
+"""
+To create log middleware instance to get log data
+"""
+
 from datetime import datetime
 
+from app import create_app
 from app import db
 from app.models.Log_middleware import LogMiddleware
 from flask import Request
 
 
+app, mail = create_app()
+
+
 class Log_Middleware:
+
     """
-    Contains function for log middleware
+    Middleware for logging requests
     """
 
     def __init__(self, app):
         self.app = app
-        # self.logger=logging.getLogger('request_logger')
-        # self.logger.setLevel(logging.INFO)
-        # handler=RotatingFileHandler("request.log",maxBytes=10000,backupCount=1)
-        # self.logger.addHandler(handler)
 
-    def __call__(self, environment, start_response, **kwargs):
+    def __call__(self, environ, start_response, **kwargs):
         """
-        Returns request details
+        Log request details and pass the request to the Flask app
         """
-        request = Request(environment)
+        request = Request(environ)
+        with app.app_context():
 
-        request_data = {
-            'request_url': request.url,
-            'ip_address': request.remote_addr,
-            'created_at': datetime.utcnow()
-        }
-        log_entry = LogMiddleware(**request_data)
-        db.session.add(log_entry)
-        db.session.commit()
+            log_entry = {
+                'request_url': request.url,
+                'ip_address': request.remote_addr,
+                'created_at': datetime.utcnow()
+            }
+            db.session.add(LogMiddleware(**log_entry))
+            db.session.commit()
+        # print(f"Request Log: {log_entry}")
 
-        return self.app(environment=environment, start_response=start_response, **kwargs)
+        return self.app(environ=environ, start_response=start_response, **kwargs)

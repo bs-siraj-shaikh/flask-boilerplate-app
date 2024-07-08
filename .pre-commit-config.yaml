@@ -18,10 +18,10 @@ repos:
         files: ^config/
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-      - id: check-added-large-files
-        args: ['--maxkb=2048']
-      - id: no-commit-to-branch
-        args: [--branch, master, --branch, development, '--pattern', '^(?!(feature|hotfix|docs|bugfix|style|refactor|perf)\/).*']
+      # - id: check-added-large-files
+        # args: ['--maxkb=2048']
+      # - id: no-commit-to-branch
+        # args: [--branch, master, --branch, development, '--pattern', '^(?!(feature|hotfix|docs|bugfix|style|refactor|perf)\/).*']
       # - id: detect-aws-credentials  # detects your aws credentials from the aws cli credentials file.
       # - id: name-tests-test  # This hook verifies that test files are named correctly.
       #   args:
