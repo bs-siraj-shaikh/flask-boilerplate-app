@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v4.6.0
   hooks:
       - id: check-json # Attempts to load all json files to verify syntax.
       - id: pretty-format-json # Checks that all your JSON files are pretty. "Pretty" here means that keys are sorted and indented.
@@ -30,7 +30,7 @@ repos:
       - id: mixed-line-ending  # Replaces automatically the most frequent line ending.
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.7.0
+  rev: v3.16.0
   hooks:
     - id: pyupgrade # Pre-commit hook to automatically upgrade syntax for newer versions of the language.
 - repo: https://github.com/pre-commit/pygrep-hooks
@@ -43,11 +43,11 @@ repos:
   hooks:
     - id: absolufy-imports # Automatically convert relative imports to absolute
 - repo: https://github.com/jendrikseipp/vulture
-  rev: v2.7
+  rev: v2.11
   hooks:
     - id: vulture # https://github.com/jendrikseipp/vulture
 - repo: https://github.com/sqlalchemyorg/zimports/
-  rev: v0.6.0
+  rev: v0.6.1
   hooks:
     - id: zimports # https://github.com/sqlalchemyorg/zimports
 - repo: https://github.com/dannysepler/rm_unneeded_f_str
@@ -55,17 +55,17 @@ repos:
   hooks:
     - id: rm-unneeded-f-str # Find and replace unneeded f-strings in your code.
 -   repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+    rev: 7.1.0
     hooks:
     - id: flake8 # Powerful tool that checks our code's compliance to PEP8.
       additional_dependencies: ['flake8-force-keyword-arguments', 'flake8-comprehensions', 'flake8-requirements', 'pep8-naming']
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: 'v2.0.1'
+    rev: 'v2.0.4'
     hooks:
       - id: autopep8 # autopep8 automatically formats Python code to conform to the PEP 8 style guide.
         args: ["-i"]
 -   repo: https://github.com/dhruvmanila/remove-print-statements
-    rev: 'v0.5.0'
+    rev: 'v0.5.2'
     hooks:
     - id: remove-print-statements
       args: ['--verbose']   # Show all the print statements to be removed
@@ -75,11 +75,11 @@ repos:
     -   id: pylint # implemented pylint for only checking function and parameters name
         args: [--disable=all,--enable=E1120,C0103,W0613,W0612]
 -   repo: https://github.com/mattseymour/pre-commit-pytype
-    rev: '2022.4.26'
+    rev: '2023.5.8'
     hooks:
     -   id: pytype
 - repo: https://github.com/econchick/interrogate
-  rev: '1.5.0'
+  rev: '1.7.0'
   hooks:
     - id: interrogate
       exclude: ^(workers/|providers/|migrations/)

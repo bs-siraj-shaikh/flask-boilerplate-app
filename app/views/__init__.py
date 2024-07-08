@@ -1,11 +1,12 @@
 """Contain all the urls of apis"""
 from app.views.common_view import AuditView
 from app.views.common_view import FileView
-from app.views.user_view import UserView
 from app.views.student_view import StudentView
+from app.views.user_view import UserView
 from flask import Blueprint
 from flask import g
 from flask import request
+# from app.views.common_view import FileView
 # template_dir = os.path.abspath('app/views/users')
 v1_blueprints = Blueprint(name='v1', import_name='api1')
 

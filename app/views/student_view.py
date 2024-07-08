@@ -47,7 +47,8 @@ class StudentView(View):
         response = {'token': token, 'student': student_details,
                     'message': 'Successfully login'}
         return send_json_response(http_status=HttpStatusCode.OK.value, response_status=True,
-                                  message_key=ResponseMessageKeys.SUCCESS.value,
+                                  message_key=ResponseMessageKeys.LOGIN_SUCCESSFULLY.value.format(
+                                      student.name),
                                   data=response)
         # return response
 
@@ -197,11 +198,11 @@ class StudentView(View):
         student['email'] = data.get(key='email', default=student['email'])
         if 'password' in data:
             student['password'] = data.get(
-                ['password'], default=student['password'])
+                key='password', default=student['password'])
 
         db.session.commit()
         return send_json_response(http_status=HttpStatusCode.OK.value, response_status=True,
-                                  message_key=ResponseMessageKeys.SUCCESS.value, data=student)
+                                  message_key=ResponseMessageKeys.STUDENT_UPDATED.value, data=student)
 
     @staticmethod
     @api_time_logger
@@ -239,7 +240,7 @@ class StudentView(View):
         # data={'data':student_data}
         return send_json_response(http_status=HttpStatusCode.OK.value,
                                   response_status=True,
-                                  message_key=ResponseMessageKeys.SUCCESS.value,
+                                  message_key=ResponseMessageKeys.STUDENT_PASSWORD_UPDATED.value,
                                   data=student_data)
 
     @staticmethod

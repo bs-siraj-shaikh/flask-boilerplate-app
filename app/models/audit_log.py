@@ -111,13 +111,12 @@ class AuditLog(db.Model):
         """
             Object Representation Method for custom object representation on console or log
         """
-        return '<AuditLog %r: %r -> %r>' % (self.user_id, self.table_name, self.action)
+        return '<AuditLog {!r}: {!r} -> {!r}>'.format(self.user_id, self.table_name, self.action)
 
     def save(self, connection):
         """ Insert data into table """
 
-        connection.execute(
-            self.__table__.insert(),
+        insert_stmt = self.__table__.insert().values(
             user_id=self.user_id,
             table_name=self.table_name,
             object_id=self.object_id,
@@ -131,6 +130,7 @@ class AuditLog(db.Model):
             args=self.args,
             ip=self.ip
         )
+        connection.execute(insert_stmt)
 
     @classmethod
     def get_logs(cls, action: Any = None, user_id: Any = None,
