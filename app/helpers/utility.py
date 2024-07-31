@@ -18,6 +18,7 @@ hash_id = Hashids(min_length=7, salt=config_data.get('HASH_ID_SALT'))
 
 
 def days_to_seconds(days: int) -> int:
+    """ returns seconds """
     seconds = 86400 * days  # 24 * 60 * 60 * days
     return seconds
 

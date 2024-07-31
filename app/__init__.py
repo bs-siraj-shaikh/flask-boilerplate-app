@@ -7,20 +7,18 @@ import sys
 import traceback
 
 from app.helpers.constants import HttpStatusCode
-from app.helpers.constants import QueueName
 from app.helpers.constants import ResponseMessageKeys
 import boto3
 from botocore.client import Config
-from flask import Flask,request
-from flask_restful import Resource,Api
+from flask import Flask
 from flask import jsonify
-from flask_limiter import Limiter
 from flask_limiter import RequestLimit
+from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_swagger_ui import get_swaggerui_blueprint
 import redis
-from rq import Queue
 from rq_scheduler import Scheduler
 import yaml
 
@@ -84,26 +82,19 @@ def create_app():
     """
     try:
         application = Flask(__name__, instance_relative_config=True)
+        app_set_configurations(application=application,
+                               config_data=config_data)
         application.config.from_object(config_data)
         # if TESTING:
         #     application.config.update({
         #     'SQLALCHEMY_DATABASE_URI': config_data.get('SQLALCHEMY_TEST_DATABASE_URI')
         #     })
         # Global error handler for error code 429 (Too Many Requests)
-        
+        mail = Mail(application)
 
         application.register_error_handler(429, ratelimit_handler)  # type: ignore  # noqa: FKA100
-        db.init_app(application)
+        # db.init_app(application)
         Migrate(app=application, db=db, compare_type=True)
-
-        r = redis.Redis(host=config_data.get('REDIS').get('HOST'), port=config_data.get(
-                'REDIS').get('PORT'), db=config_data.get('REDIS').get('DB'))
-        send_mail_q = Queue(QueueName.SEND_MAIL, connection=r)
-
-        limiter = Limiter(app=application, key_func=None, strategy=config_data.get('STRATEGY'),  # Creating instance of Flask-Limiter for rate limiting.
-                  key_prefix=config_data.get('KEY_PREFIX'), storage_uri='redis://{}:{}/{}'.format(
-                config_data.get('REDIS').get('HOST'), config_data.get('REDIS').get('PORT'), config_data.get('RATE_LIMIT').get('REDIS_DB')))
-
 
         app_set_configurations(application=application,
                                config_data=config_data)
@@ -111,7 +102,7 @@ def create_app():
         register_blueprints(application)
         register_swagger_blueprints(application)
 
-        return application
+        return application, mail
 
     except Exception as exception_error:
         logger.error('Unable to create flask app instance : '
@@ -141,9 +132,9 @@ def register_blueprints(application):
     :return: None
     """
     try:
+        # from app.views import v1_blueprints
         from app.views import v1_blueprints
         application.register_blueprint(v1_blueprints, url_prefix='/api/v1')
-
     except Exception as exception_error:
         trace = traceback.extract_tb(sys.exc_info()[2])
         # Add the event to the log
@@ -157,6 +148,7 @@ def register_blueprints(application):
         logger.error('Exception Stack Trace')
         logger.error(output)
         logger.error('=========END=========')
+
 
 def register_swagger_blueprints(application):
     """
@@ -178,8 +170,7 @@ def register_swagger_blueprints(application):
             swagger_blueprint, url_prefix=swagger_url)
 
     except Exception as exception_error:
-        logger.error('Unable to register blueprints : '
-                     + str(exception_error))
+        logger.error('Unable to register blueprints : ' + str(exception_error))
 
 
 def app_set_configurations(application, config_data):
@@ -194,7 +185,9 @@ def app_set_configurations(application, config_data):
 
 
 r = redis.Redis(host=config_data.get('REDIS').get('HOST'), port=config_data.get(
-                'REDIS').get('PORT'), db=config_data.get('REDIS').get('DB'))
+    'REDIS').get('PORT'), db=config_data.get('REDIS').get('DB'))
+
+
 def clear_scheduler():
     """ Method to delete scheduled jobs in scheduler. """
     scheduler = Scheduler(connection=r)
@@ -203,67 +196,7 @@ def clear_scheduler():
 
 
 application = Flask(__name__)
-api=Api(application)
-# app_set_configurations(application=app, config_data=config_data)
-db = SQLAlchemy(app=application,session_options={'expire_on_commit': False})
-# migrate = Migrate(app=app, db=db, compare_type=True)
-
-
-# class SMS(db.Model):
-#     sid=db.Column(db.Integer,primary_key=True)
-#     name=db.Column(db.String,nullable=False)
-#     clas=db.Column(db.Integer,nullable=False)
-#     division=db.Column(db.String,nullable=False)
-
-#     def __repr__(self):
-#         return f"{self.name}:{self.clas}-{self.division}"
-
-# Students class
-# class Students(Resource):
-#     def get(self):
-#         students=SMS.query.all()
-#         return [str(student) for student in students]
-
-#     def post(self):
-#         data=request.json
-
-    
-# class Student(Resource):
-#     def get(self,sid):
-#         return 
-
-#     def put(self,sid):
-#         data=request.json
-    
-#     def delete(self,sid):
-#         # del
-#         return 
-
-
-# class HelloWorld(Resource):
-#     def get(self):
-#         return {'message': 'Hello, World!'}
-
-# api.add_resource(HelloWorld, '/hello')
-# api.add_resource(Students, '/students')
-# api.add_resource(Student, '/student/<int:sid>')
-
-
-
-# # Create resources for students and student classes
-# api.add_resource(Students,'/')
-# api.add_resource(Student,'/<int:sid>')
-
-
-# CORS(app, resources={r'/api/*': {'origins': '*'}})
-
-
-
-
-
-
-# clear_scheduler()
-
-# limiter = Limiter(app=app, key_func=None, strategy=config_data.get('STRATEGY'),  # Creating instance of Flask-Limiter for rate limiting.
-#                   key_prefix=config_data.get('KEY_PREFIX'), storage_uri='redis://{}:{}/{}'.format(
-#     config_data.get('REDIS').get('HOST'), config_data.get('REDIS').get('PORT'), config_data.get('RATE_LIMIT').get('REDIS_DB')))
+api = Api(application)
+app_set_configurations(application=application, config_data=config_data)
+db = SQLAlchemy(app=application, session_options={'expire_on_commit': False})
+migrate = Migrate(app=application, db=db, compare_type=True)
